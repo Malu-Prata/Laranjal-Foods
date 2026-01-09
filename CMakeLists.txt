@@ -1,3 +1,7 @@
+if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
+    message(FATAL_ERROR "O comando certo é: 'cmake -S . -B build'")
+endif()
+
 cmake_minimum_required(VERSION 3.28.3)
 
 project(laranjal_foods VERSION 0.1)
