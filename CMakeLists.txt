@@ -1,5 +1,9 @@
 if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
-    message(FATAL_ERROR "O comando certo é: 'cmake -S . -B build'")
+    message(FATAL_ERROR
+        "Vá para '/Laranjal-Foods/build' e use o comando 'cmake ..'\n"
+        "ou\n"
+        "Vá para '/Laranjal-Foods/' e use o comando 'cmake -S . -B build'"
+)
 endif()
 
 cmake_minimum_required(VERSION 3.28.3)
