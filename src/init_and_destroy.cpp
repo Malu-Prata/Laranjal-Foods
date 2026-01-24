@@ -16,11 +16,11 @@ void destroyMutexes(std::vector<pthread_mutex_t>& mutexes){
 }
 
 void spawnThreads(std::vector<pthread_t>& threads, 
-                  const char* tipoEntreg, 
+                  const char* tipoEntrega, 
                   void* (*function)(void*))
 {
     for (size_t i = 0; i < threads.size(); i++){
-        pthread_create(&threads[i], NULL, function, (void*) tipoEntreg);
+        pthread_create(&threads[i], NULL, function, (void*) tipoEntrega);
     }
 }
 
