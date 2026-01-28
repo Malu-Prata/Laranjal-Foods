@@ -1,7 +1,6 @@
 #include <vector>
 #include <pthread.h>
 #include "headers/ThreadArgs.h"
-#include "headers/buildTabs.h"
 
 // AINDA TEM QUE TRATAR OS IFS CASO CRIAR A THREADS (e etc) FALHAR
 
@@ -19,12 +18,9 @@ void destroyMutexes(std::vector<pthread_mutex_t>& mutexes){
 
 void spawnThreads(std::vector<pthread_t>& threads, 
                   const char* tipoEntregador, 
-                  void* (*function)(void*))
-{
-    auto spacesForThreads = buildTabs(threads.size());
-
+                  void* (*function)(void*)){
     for (size_t i = 0; i < threads.size(); i++){
-        ThreadArgs* args = new ThreadArgs{tipoEntregador, spacesForThreads[i], (int) i + 1};
+        ThreadArgs* args = new ThreadArgs{tipoEntregador, (int) i + 1};
         pthread_create(&threads.at(i), NULL, function, (void*) args);
     }
 }
