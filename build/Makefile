@@ -129,29 +129,29 @@ laranjal_foods/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/laranjal_foods.dir/build.make CMakeFiles/laranjal_foods.dir/build
 .PHONY : laranjal_foods/fast
 
-src/buildStrings.o: src/buildStrings.cpp.o
-.PHONY : src/buildStrings.o
+src/build_strings.o: src/build_strings.cpp.o
+.PHONY : src/build_strings.o
 
 # target to build an object file
-src/buildStrings.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/laranjal_foods.dir/build.make CMakeFiles/laranjal_foods.dir/src/buildStrings.cpp.o
-.PHONY : src/buildStrings.cpp.o
+src/build_strings.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/laranjal_foods.dir/build.make CMakeFiles/laranjal_foods.dir/src/build_strings.cpp.o
+.PHONY : src/build_strings.cpp.o
 
-src/buildStrings.i: src/buildStrings.cpp.i
-.PHONY : src/buildStrings.i
+src/build_strings.i: src/build_strings.cpp.i
+.PHONY : src/build_strings.i
 
 # target to preprocess a source file
-src/buildStrings.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/laranjal_foods.dir/build.make CMakeFiles/laranjal_foods.dir/src/buildStrings.cpp.i
-.PHONY : src/buildStrings.cpp.i
+src/build_strings.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/laranjal_foods.dir/build.make CMakeFiles/laranjal_foods.dir/src/build_strings.cpp.i
+.PHONY : src/build_strings.cpp.i
 
-src/buildStrings.s: src/buildStrings.cpp.s
-.PHONY : src/buildStrings.s
+src/build_strings.s: src/build_strings.cpp.s
+.PHONY : src/build_strings.s
 
 # target to generate assembly for a file
-src/buildStrings.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/laranjal_foods.dir/build.make CMakeFiles/laranjal_foods.dir/src/buildStrings.cpp.s
-.PHONY : src/buildStrings.cpp.s
+src/build_strings.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/laranjal_foods.dir/build.make CMakeFiles/laranjal_foods.dir/src/build_strings.cpp.s
+.PHONY : src/build_strings.cpp.s
 
 src/init_and_destroy.o: src/init_and_destroy.cpp.o
 .PHONY : src/init_and_destroy.o
@@ -210,9 +210,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... laranjal_foods"
-	@echo "... src/buildStrings.o"
-	@echo "... src/buildStrings.i"
-	@echo "... src/buildStrings.s"
+	@echo "... src/build_strings.o"
+	@echo "... src/build_strings.i"
+	@echo "... src/build_strings.s"
 	@echo "... src/init_and_destroy.o"
 	@echo "... src/init_and_destroy.i"
 	@echo "... src/init_and_destroy.s"

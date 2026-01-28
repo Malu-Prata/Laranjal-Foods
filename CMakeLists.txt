@@ -13,7 +13,7 @@ project(laranjal_foods VERSION 0.1)
 set(SOURCES
     src/main.cpp
     src/init_and_destroy.cpp
-    src/buildStrings.cpp
+    src/build_strings.cpp
 )
 
 add_compile_options(-Wall)
