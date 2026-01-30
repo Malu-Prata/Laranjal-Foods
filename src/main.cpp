@@ -25,7 +25,8 @@ pthread_mutex_t coutMutex = PTHREAD_MUTEX_INITIALIZER;
 
 // ========= * PREVENÇÃO DE DEADLOCK COM RESERVA DE RECURSOS * =========
 
-#define MAX_TENTATIVAS_ANTES_AGING 5
+#define TENTATIVAS_CONFIRMAR_DEADLOCK 3
+#define MAX_TENTATIVAS_TOTAIS 15
 
 pthread_mutex_t controleMutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t recursosMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -43,13 +44,12 @@ std::vector<int>   reservaMoto;    // -1 = livre, ID = reservado para esse entre
 
 int registrarThread(){
     pthread_mutex_lock(&controleMutex);
-
-    int id = lucrosGlobais.size();
-    lucrosGlobais.push_back(0.0f);
-    prioridades.push_back(0);
-    tentativasRecurso.push_back(0);
-
+        int id = lucrosGlobais.size();
+        lucrosGlobais.push_back(0.0f);
+        prioridades.push_back(0);
+        tentativasRecurso.push_back(0);
     pthread_mutex_unlock(&controleMutex);
+    
     return id;
 }
 
@@ -126,13 +126,13 @@ void* fazerEntrega(void* args){
 
         log("pegou recurso", coutMutex, spaces, cor, tipoEntregador, threadID, primeiroRecurso, numRestaurante, RESET_COR);
 
-        sleep(SLEEP_TIME);
+        sleep(SLEEP_TIME);  // caminhando pra pegar o outro recurso
 
         // PASSO 2: TENTAR PEGAR SEGUNDO RECURSO
         bool conseguiuSegundo = false;
         int tentativas = 0;
         
-        while (!conseguiuSegundo && tentativas < 15) {
+        while (!conseguiuSegundo && tentativas < MAX_TENTATIVAS_TOTAIS) {
             if (pthread_mutex_trylock(segundaAcao) == 0) {
                 // VERIFICAR SE ESTÁ RESERVADO PARA OUTRO
                 bool reservadoParaOutro = false;
@@ -152,14 +152,18 @@ void* fazerEntrega(void* args){
                     continue;
                 }
                 
-                // CONSEGUIU! Marcar propriedade
+                // CONSEGUIU! Marcar propriedade e limpar reserva se era minha
                 pthread_mutex_lock(&recursosMutex);
                     if (isVeterano) { 
                         donoDoPedido[restIndex] = idLocal;
-                        reservaPedido[restIndex] = -1;  // Limpar qualquer reserva
+                        if (reservaPedido[restIndex] == idLocal) {  // só limpa se era minha reserva
+                            reservaPedido[restIndex] = -1;
+                        }
                     } else { 
                         donoDaMoto[restIndex] = idLocal;
-                        reservaMoto[restIndex] = -1;    // Limpar qualquer reserva
+                        if (reservaMoto[restIndex] == idLocal) {    // só limpa se era minha reserva
+                            reservaMoto[restIndex] = -1;
+                        }
                     }
                 pthread_mutex_unlock(&recursosMutex);
                 
@@ -170,7 +174,7 @@ void* fazerEntrega(void* args){
                 tentativas++;
                 
                 // Só toma decisão após confirmar deadlock (3+ tentativas)
-                if (tentativas >= 3) {
+                if (tentativas >= TENTATIVAS_CONFIRMAR_DEADLOCK) {
                     
                     // DETECTAR QUEM É O ADVERSÁRIO
                     pthread_mutex_lock(&recursosMutex);
@@ -234,7 +238,7 @@ void* fazerEntrega(void* args){
                             int backoffTime = 300000 + (prioridades[idLocal] * 100000) + (rand_r(&seedLocal) % 500000);
                             usleep(backoffTime);
                             
-                            break;
+                            break;  // sai do while e volta pro início do loop principal
                         } else {
                             // EU FICO
                             tentativasRecurso[idLocal]++;
@@ -248,7 +252,7 @@ void* fazerEntrega(void* args){
             }
         }
         
-        // Se não conseguiu após todas tentativas
+        // Se não conseguiu após todas tentativas, desiste e recomeça
         if (!conseguiuSegundo) {
             pthread_mutex_lock(&controleMutex);
                 prioridades[idLocal]++;
@@ -262,7 +266,7 @@ void* fazerEntrega(void* args){
             pthread_mutex_unlock(primeiraAcao);
             
             usleep(500000 + (rand_r(&seedLocal) % 500000));
-            continue;
+            continue;  // volta pro início do loop principal
         }
         
         // ========= SUCESSO! AMBOS RECURSOS ADQUIRIDOS =========
@@ -273,7 +277,7 @@ void* fazerEntrega(void* args){
 
         pthread_mutex_lock(&controleMutex);
             lucrosGlobais[idLocal] += ganho;
-            prioridades[idLocal] = 0;
+            prioridades[idLocal] = 0;           // reset prioridade após sucesso
             tentativasRecurso[idLocal] = 0;
         pthread_mutex_unlock(&controleMutex);
 
@@ -285,6 +289,7 @@ void* fazerEntrega(void* args){
             donoDaMoto[restIndex] = -1;
         pthread_mutex_unlock(&recursosMutex);
 
+        // Liberar recursos na ordem inversa pra reduzir contenção
         pthread_mutex_unlock(segundaAcao);
         pthread_mutex_unlock(primeiraAcao);
 
@@ -294,7 +299,7 @@ void* fazerEntrega(void* args){
 
         log("possui R$", coutMutex, spaces, cor, tipoEntregador, threadID, primeiroRecurso, numRestaurante, RESET_COR, lucroAtual);
 
-        usleep(500000);
+        usleep(500000);  // pausa antes de próxima entrega
     }
 
     pthread_exit(NULL);
