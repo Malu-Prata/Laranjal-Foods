@@ -14,6 +14,7 @@ set(SOURCES
     src/main.cpp
     src/init_and_destroy.cpp
     src/build_strings.cpp
+    src/log.cpp
 )
 
 add_compile_options(-Wall)
