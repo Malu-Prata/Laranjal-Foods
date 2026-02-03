@@ -98,24 +98,21 @@ void* fazerEntrega(void* args){
                          else { reservaPedido[restIndex] = -1; }
             pthread_mutex_unlock(&recursosMutex);
         } else {
-            // Sem reserva: tentar pegar normalmente
-            pthread_mutex_lock(primeiraAcao);
+            pthread_mutex_lock(primeiraAcao);                       // não tem reserva, vai tentar pegar o 1º recurso na sorte
             
-            // Verificar se não está reservado para outro
-            bool recursoReservado = false;
+            // verificar se o 1º recurso não está reservado para outro entregador
+            bool recursoReservadoPraOutro = false;
             pthread_mutex_lock(&recursosMutex);
                 if (isVeterano && reservaMoto[restIndex] != -1) {
-                    recursoReservado = true;
+                    recursoReservadoPraOutro = true;
                 } else if (!isVeterano && reservaPedido[restIndex] != -1) {
-                    recursoReservado = true;
+                    recursoReservadoPraOutro = true;
                 }
             pthread_mutex_unlock(&recursosMutex);
-            
-            // Se está reservado para outro, desiste imediatamente
-            if (recursoReservado) {
+            if (recursoReservadoPraOutro) {                         // se estiver, desiste imediatamente
                 pthread_mutex_unlock(primeiraAcao);
                 usleep(200000 + (rand_r(&seedLocal) % 300000));
-                continue;
+                continue;                                           // e procura outro restaurante
             }
         }
 
